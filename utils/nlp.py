@@ -1,9 +1,8 @@
 import nltk
-import string
 import pandas as pd
 import re
 from nltk.corpus import stopwords
-from nltk.stem.porter import PorterStemmer
+# from nltk.stem.porter import PorterStemmer
 from nltk.stem import RSLPStemmer
 
 def to_lower(text:str)-> str:
@@ -104,11 +103,11 @@ def process_dataset(dataset: pd.core.frame.DataFrame,
     for index, row in dataset.iterrows():
         if debug:
             print(f"Processing {index+1}/{total}", end="\r")
-        processed.append(process_sentence(row["text"]),
+        processed.append(process_sentence(row["text"],
                          process_symbols,
                          process_stopwords,
                          process_numbers,
-                         process_single_letters)
+                         process_single_letters))
     
     return processed
 
@@ -120,7 +119,7 @@ def create_word_corpus(dataset:list,
     It also returns the term_count for the corpus, allowing for later document encoding
     """
     raw_word_corpus = [w for item in dataset for w in item]
-    raw_word_corpus = list(set(word_corpus))
+    raw_word_corpus = list(set(raw_word_corpus))
 
     term_count = {w:0 for w in raw_word_corpus}
     for text in dataset:

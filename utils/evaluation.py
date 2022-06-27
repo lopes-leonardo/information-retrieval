@@ -63,4 +63,4 @@ class RetrievalEvaluation:
         print("Precision at 20:", self.p_at_20())
         print("Precision at 50:", self.p_at_50())
         print("Precision at 100:", self.p_at_100())
-        # print("Map:", self.compute_map())
+        print("Map:", self.compute_map())

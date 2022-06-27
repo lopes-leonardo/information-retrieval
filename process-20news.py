@@ -10,7 +10,9 @@ from utils.retrieval import (
     BM1Model,
     BM11Model,
     BM15Model,
-    BM25Model
+    BM25Model,
+    SBertNaiveModel,
+    SBertModel
 )
 
 MODELS = {
@@ -21,6 +23,8 @@ MODELS = {
     "BM11": BM11Model,
     "BM15": BM15Model,
     "BM25": BM25Model,
+    "SBertNaive": SBertNaiveModel,
+    "SBert": SBertModel,
 }
 
 if __name__ == "__main__":

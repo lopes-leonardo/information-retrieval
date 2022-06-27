@@ -3,6 +3,7 @@ import numpy as np
 import math
 from abc import ABC, abstractmethod
 from sklearn import metrics
+from sentence_transformers import SentenceTransformer
 
 
 class VectorRetrievalModel(ABC):
@@ -329,3 +330,48 @@ class BM25Model(VectorRetrievalModel):
             tf_idf = tf * self.word_idf[index] if item.count(word) > 0 else 0
             tf_idf_item.append(tf_idf)
         return tf_idf_item
+
+class SBertNaiveModel(VectorRetrievalModel):
+    
+    def __init__(self, word_corpus:pd.DataFrame):
+        super().__init__(word_corpus)
+        self.metric = "cosine"
+        self.model = SentenceTransformer('all-mpnet-base-v2')
+    
+    def convert_dataset(self, dataset:list):
+        sentences = [" ".join(item) for item in dataset]
+        bert_dataset = self.model.encode(sentences)
+        self.dataset = np.asarray(bert_dataset)
+    
+    def convert_item(self, item:list)-> list:
+        return []
+
+class SBertModel(VectorRetrievalModel):
+    
+    def __init__(self, word_corpus:pd.DataFrame):
+        super().__init__(word_corpus)
+        self.metric = "cosine"
+        self.model = SentenceTransformer('all-mpnet-base-v2')
+        self.sentence_lenght = 384
+    
+    def convert_dataset(self, dataset:list):
+        bert_dataset = []
+        for item in dataset:
+            bert_dataset.append(self.convert_item(item))
+        self.dataset = np.asarray(bert_dataset)
+        np.save("bert_dataset", self.dataset)
+    
+    def convert_item(self, item:list)-> list:
+        if len(item) > self.sentence_lenght:
+            sentences = []
+            splits = int(math.ceil(len(item)/self.sentence_lenght))
+            for i in range(splits):
+                start = i*self.sentence_lenght
+                end = (i+1)*self.sentence_lenght
+                sentences.append(" ".join(item[start:end]))           
+            embedding = self.model.encode(sentences)
+            embedding = np.sum(embedding, axis=0) / len(sentences)
+        else:
+            embedding = self.model.encode([" ".join(item)])[0]
+        
+        return list(embedding)

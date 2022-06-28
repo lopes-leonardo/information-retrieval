@@ -16,14 +16,14 @@ from utils.retrieval import (
 )
 
 MODELS = {
-    "binary": BinaryModel,
-    "BoW": BagOfWordsModel,
-    "TFIDF": TfIdfModel,
-    "BM1": BM1Model,
-    "BM11": BM11Model,
-    "BM15": BM15Model,
-    "BM25": BM25Model,
-    "SBertNaive": SBertNaiveModel,
+    # "binary": BinaryModel,
+    # "BoW": BagOfWordsModel,
+    # "TFIDF": TfIdfModel,
+    # "BM1": BM1Model,
+    # "BM11": BM11Model,
+    # "BM15": BM15Model,
+    # "BM25": BM25Model,
+    # "SBertNaive": SBertNaiveModel,
     "SBert": SBertModel,
 }
 

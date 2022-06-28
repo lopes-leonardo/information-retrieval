@@ -3,7 +3,7 @@ import numpy as np
 import math
 from abc import ABC, abstractmethod
 from sklearn import metrics
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import models, SentenceTransformer
 
 
 class VectorRetrievalModel(ABC):
@@ -360,6 +360,39 @@ class SBertModel(VectorRetrievalModel):
             bert_dataset.append(self.convert_item(item))
         self.dataset = np.asarray(bert_dataset)
         np.save("bert_dataset", self.dataset)
+    
+    def convert_item(self, item:list)-> list:
+        if len(item) > self.sentence_lenght:
+            sentences = []
+            splits = int(math.ceil(len(item)/self.sentence_lenght))
+            for i in range(splits):
+                start = i*self.sentence_lenght
+                end = (i+1)*self.sentence_lenght
+                sentences.append(" ".join(item[start:end]))           
+            embedding = self.model.encode(sentences)
+            embedding = np.sum(embedding, axis=0) / len(sentences)
+        else:
+            embedding = self.model.encode([" ".join(item)])[0]
+        
+        return list(embedding)
+
+class TransEncoderModel(VectorRetrievalModel):
+    
+    def __init__(self, word_corpus:pd.DataFrame):
+        super().__init__(word_corpus)
+        self.metric = "cosine"
+        self.sentence_lenght = 384
+        
+        # Build model
+        word_embedding_model = models.Transformer("cambridgeltl/trans-encoder-bi-simcse-roberta-large", self.sentence_lenght)
+        pooling_model = models.Pooling(word_embedding_model.get_word_embedding_dimension(), pooling_mode="cls")
+        self.model = SentenceTransformer(modules=[word_embedding_model, pooling_model], device="cuda")
+    
+    def convert_dataset(self, dataset:list):
+        sentences = [" ".join(item) for item in dataset]
+        embeddings = self.model.encode(sentences, batch_size=10, show_progress_bar=True, convert_to_numpy=True)
+        self.dataset = np.asarray(embeddings)
+        np.save("transencoder_dataset", self.dataset)
     
     def convert_item(self, item:list)-> list:
         if len(item) > self.sentence_lenght:

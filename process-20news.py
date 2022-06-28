@@ -12,7 +12,8 @@ from utils.retrieval import (
     BM15Model,
     BM25Model,
     SBertNaiveModel,
-    SBertModel
+    SBertModel,
+    TransEncoderModel
 )
 
 MODELS = {
@@ -24,7 +25,8 @@ MODELS = {
     # "BM15": BM15Model,
     # "BM25": BM25Model,
     # "SBertNaive": SBertNaiveModel,
-    "SBert": SBertModel,
+    # "SBert": SBertModel,
+    "TransEncoderModel": TransEncoderModel, 
 }
 
 if __name__ == "__main__":
@@ -49,7 +51,7 @@ if __name__ == "__main__":
         print("Done.")
 
         print("-> Computing Ranked Lists...", end=" ")
-        model.compute_ranked_lists(test_filter=test_filter)
+        model.compute_ranked_lists(test_filter=None)
         ranked_lists = model.get_ranked_lists()
         print("Done.")
 
